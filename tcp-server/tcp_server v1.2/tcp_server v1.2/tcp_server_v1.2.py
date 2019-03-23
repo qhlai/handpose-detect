@@ -3,6 +3,9 @@
 
 from socket import *
 from time import ctime
+from time import sleep
+import serial
+
 
 host = ''
 port = 4302
@@ -14,15 +17,20 @@ tctime.bind(ADDR)
 tctime.listen(3)
 
 
-instruction = [0]*16
+
 
 while True:
     print('Wait for connection ...')
     tctimeClient,addr = tctime.accept()
     print("Connection from :",addr)
 
+    ser = serial.Serial('/dev/ttyUSB0',9600,timeout=0.5)
+
+    if ser.isOpen==False:
+        ser.open()
+        print("serial success open")
     while True:
-        #receive
+        #tcp receive
 
         data = tctimeClient.recv(buffsize).decode()
 
@@ -41,11 +49,13 @@ while True:
             print(name)  
             print( movement1 + movement2+angle)
             
-        
+        ser.write(b"0")    #'b':表示要读写二进制数据 控制信号
         
 
         #send
 
         #tctimeClient.send(('[%s] %s' % (ctime(),data)).encode())
     tctimeClient.close()
+    ser.close()
 tctimeClient.close()
+ser.close()
