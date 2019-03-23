@@ -215,13 +215,16 @@ void loop()
     Serial.write(mySerial.read());
   }
   //transmit
-       mySerial.write(64);//ASCLL @号,分隔符
+       mySerial.write(36);//ASCLL $号,占位符
+       mySerial.write(64);//ASCLL @号,标志符
+       tcpsend_procceed(test , 1.0, 1, 0, 2);//设备编号
+       mySerial.write(35);//ASCLL #井号，分隔符
        tcpsend_procceed(test , real_gesture.up_down, 1, 0, 2);
        mySerial.write(35);//ASCLL #井号
        tcpsend_procceed(test , real_gesture.left_right, 1, 0, 2);
        mySerial.write(35);//ASCLL #井号
        tcpsend_procceed(test , angle, 3, 2, 5);
-       mySerial.write(33);//ASCLL !号
+       mySerial.write(33);//ASCLL !号，结束符
        
        
   //可视化分析
@@ -248,7 +251,7 @@ void loop()
   Serial.print("angle6: ");Serial.println(angle6);
   */
   
-  delay(200);
+  //delay(200);
 }
 void getsum(float fNewPitch,float fNewRoll)//求一段时间内算得的pitch角的和值
 {
