@@ -49,7 +49,9 @@ while True:
             print(name)  
             print( movement1 + movement2+angle)
             
-        ser.write(b"0")    #'b':表示要读写二进制数据 控制信号
+        if movement1 == 1 and movement2 == 2:
+            ser.write(b"0")    #'b':表示要读写二进制数据 控制信号
+        
         
 
         #send
