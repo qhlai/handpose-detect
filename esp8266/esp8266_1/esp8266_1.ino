@@ -1,10 +1,10 @@
 #include <ESP8266WiFi.h>
 
-const char *ssid = "P20";
+const char *ssid = "HIT";
 const char *password = "299792458";
 
 WiFiClient client; 
-const char *host = "192.168.43.94";
+const char *host = "192.168.3.11";
 const int port = 4302;
 
 void setupWifi() {
