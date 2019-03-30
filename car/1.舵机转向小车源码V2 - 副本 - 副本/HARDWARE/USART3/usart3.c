@@ -50,31 +50,36 @@ void USART3_IRQHandler(void)
   	  Usart3_Receive=USART3->DR; 
 			/*APP_RX=Usart3_Receive;
 			if(Usart3_Receive>=0x41&&Usart3_Receive<=0x48)  
-			Flag_Direction=Usart3_Receive-0x40;
-			else 	if(Usart3_Receive<10)  
+			Flag_Direction=Usart3_Receive-0x40;*/
+		
+			if(Usart3_Receive<10)  
 			Flag_Direction=Usart3_Receive;	
-			else 	if(Usart3_Receive==0X5A)   
-			Flag_Direction=0;*/	
-			if(Usart3_Receive==0x30)       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			else 	if(Usart3_Receive==0X5A)   //急停
+			Flag_Direction=0;
+			
+			/*if(Usart3_Receive==0x30)       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				Flag_Direction=0;
 				//Usart3_Receive = '9';
 			if(Usart3_Receive==0x31)       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				Flag_Direction=1;
-				//Usart3_Receive = '9';
+				//Usart3_Receive = '9';*/
+			
 				//以下是与APP调试界面通讯
-		/*if(Usart3_Receive==0x7B) Flag_PID=1;   //APP参数指令起始位
-		if(Usart3_Receive==0x7D) Flag_PID=2;   //APP参数指令停止位
+		if(Usart3_Receive==0x7B) Flag_PID=1;   //APP参数指令起始位  {
+
+		if(Usart3_Receive==0x7D) Flag_PID=2;   //APP参数指令停止位  }
 
 		 if(Flag_PID==1)  //采集数据
 		 {
 			Receive[i]=Usart3_Receive;
 			i++;
 		 }
+		 
 		 if(Flag_PID==2)  //分析数据
 		 {
 					 if(Receive[3]==0x50) 	 PID_Send=1;
 					 else  if(Receive[3]==0x57) 	 Flash_Send=1;
-					 else  if(Receive[1]!=0x23) 
+					 else  if(Receive[1]!=0x23) //#
 					 {								
 						for(j=i;j>=4;j--)
 						{
@@ -98,8 +103,8 @@ void USART3_IRQHandler(void)
 					 j=0;
 					 Data=0;
 					 memset(Receive, 0, sizeof(u8)*50);//数组清零
-		 }*/ 	 			
+		 }	
 	}  											 
-} 
+}
 
 
