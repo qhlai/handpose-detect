@@ -43,7 +43,7 @@ void USART3_IRQHandler(void)
 	{	  
 			static u8 Flag_PID,i,j,Receive[4];//定义Receive为一帧数据，格式为{movement1，movement2},大括号代表开始和终止
 			static u8 select_movement[5][5];//定义一个表，用于搜索命令
-			//static float Data;
+			static float Data;
 			u8 temp_num1,temp_num2,init=65;
 			static int isinit;//定义：isinit，作用判定是否赋初值，0为假1为真
 			static u8 movement1,movement2;

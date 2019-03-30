@@ -36,7 +36,7 @@ void TIM1_UP_IRQHandler(void)
 			 }
 						Encoder_Left=Read_Encoder(2);                                       //===读取编码器的值							 //为了保证M法测速的时间基准，首先读取编码器数据
 						Encoder_Right=-Read_Encoder(3);                                      //===读取编码器的值
-					 /*if(Flag_Way==2)
+					 if(Flag_Way==2)
 					 {	 
 								RD_TSL();                           		 //===读取线性CCD数据 
 						 	  Find_CCD_Zhongzhi();			          		 //===提取中线 
@@ -48,8 +48,8 @@ void TIM1_UP_IRQHandler(void)
 								Sensor_Middle=Get_Adc(2);              //采集中间电感的数据
 					  	  sum=Sensor_Left*1+Sensor_Middle*100+Sensor_Right*199;  //归一化处理
 								Sensor=sum/(Sensor_Left+Sensor_Middle+Sensor_Right);   //求偏差
-					 }*/						 
-						Get_RC();                                                             //遥控
+					 }						 
+						Get_RC();
 						Kinematic_Analysis(Velocity,Angle);     															//小车运动学分析   
 						if(Turn_Off(Voltage)==0)                              							 //===如果不存在异常
 						{
@@ -184,9 +184,9 @@ int Incremental_PI_B (int Encoder,int Target)
 **************************************************************************/
 void Get_RC(void)
 {
-	//int Yuzhi=2;
-//	static float Bias,Last_Bias;
-//  float LY,RX;
+	int Yuzhi=2;
+	static float Bias,Last_Bias;
+  float LY,RX;
 	if(Flag_Way==0)//蓝牙控制
 	{
 		if(Flag_Direction==0) Velocity=0,Angle=0;   //停止
@@ -199,7 +199,7 @@ void Get_RC(void)
 		else if(Flag_Direction==7) Velocity=0,Angle=0;                       //舵机向左
 		else if(Flag_Direction==8) Velocity=Bluetooth_Velocity,Angle=-PI/5;  //左前
 	}
-	/*else	if(Flag_Way==1)//PS2控制
+	else	if(Flag_Way==1)//PS2控制
 	{
   	LY=PS2_LY-128;     //计算偏差
 		RX=PS2_RX-128;
@@ -221,7 +221,7 @@ void Get_RC(void)
 		 Bias=100-Sensor;  //提取偏差
 		 Angle=myabs(Bias)*Bias*0.0002+Bias*0.001+(Bias-Last_Bias)*0.05; //
 		 Last_Bias=Bias;   //上一次的偏差
-	}*/
+	}
 	else if(Flag_Way==4)//树莓派控制
 	{
 		switch(Flag_Direction)
@@ -252,6 +252,15 @@ void Get_RC(void)
 			case 24:Velocity=-10,Angle=-PI/10;break;//弱后退
 			case 25:Velocity=-10,Angle=PI/10;break;//弱后退
 		}
+		/*if(Flag_Direction==0) Velocity=0,Angle=0;   //停止
+		else if(Flag_Direction==1) Velocity=Bluetooth_Velocity,Angle=0;  //前进
+		else if(Flag_Direction==2) Velocity=Bluetooth_Velocity,Angle=PI/5;  //右前
+		else if(Flag_Direction==3) Velocity=0,Angle=0;   //舵机向右
+		else if(Flag_Direction==4) Velocity=-Bluetooth_Velocity,Angle=PI/5;  // 右后
+		else if(Flag_Direction==5) Velocity=-Bluetooth_Velocity,Angle=0;    //后退
+		else if(Flag_Direction==6) Velocity=-Bluetooth_Velocity,Angle=-PI/5;  //左后
+		else if(Flag_Direction==7) Velocity=0,Angle=0;                       //舵机向左
+		else if(Flag_Direction==8) Velocity=Bluetooth_Velocity,Angle=-PI/5;  //左前*/
 	}
 }
 /**************************************************************************
@@ -259,7 +268,6 @@ void Get_RC(void)
 入口参数：无
 返回  值：无
 **************************************************************************/
-/*
 void  Find_CCD_Zhongzhi(void)
 { 
 	 static u16 i,j,Left,Right,Last_CCD_Zhongzhi;
@@ -299,4 +307,3 @@ void  Find_CCD_Zhongzhi(void)
 //	CCD_Zhongzhi=Last_CCD_Zhongzhi;    //则取上一次的值
 //	Last_CCD_Zhongzhi=CCD_Zhongzhi;  //保存上一次的偏差
 }
-}*/
