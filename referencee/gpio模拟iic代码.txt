@@ -1,0 +1,201 @@
+    #define BITBAND(addr, bitnum) ((addr & 0xF0000000)+0x2000000+((addr &0xFFFFF)<<5)+(bitnum<<2))
+    #define MEM_ADDR(addr) *((volatile unsigned long *)(addr))
+    #define BIT_ADDR(addr, bitnum) MEM_ADDR(BITBAND(addr, bitnum))
+
+    #define GPIOB_ODR_Addr (GPIOB_BASE+12)
+    #define GPIOB_IDR_Addr (GPIOB_BASE+8)
+
+
+    #define PBout(n) BIT_ADDR(GPIOB_ODR_Addr,n) //输出
+    #define PBin(n) BIT_ADDR(GPIOB_IDR_Addr,n) //输入
+
+    //驱动接口，GPIO模拟IIC
+    //PB7->I2C_SDA
+    //PB6->I2C_SCL
+    #define SDA_IN() {GPIOB->CRL&=0x0FFFFFFF;GPIOB->CRL|=0x80000000;} //上拉输入
+    #define SDA_OUT() {GPIOB->CRL&=0x0FFFFFFF;GPIOB->CRL|=0x30000000;} //通用推挽输出，不用硬件IIC
+
+
+    //IO操作函数
+    #define IIC_SCL PBout(6)
+    #define IIC_SDA PBout(7)
+    #define READ_SDA PBin(7)
+
+
+
+    /******************************************
+    *函数原型： void IIC_Start(void)
+    *功能： 产生IIC起始信号
+    ******************************************/
+    void IIC_Start(void)
+    {
+        SDA_OUT();
+        IIC_SDA=1;
+        IIC_SCL=1;
+        delay_us(4);
+        IIC_SDA=0; //START:when CLK is high,SDA change from hig to low
+        delay_us(4);
+        IIC_SCL=0; //Ready Transmit or Receive
+    }
+
+    /******************************************
+    *函数原型： void IIC_Start(void)
+    *功能： 产生IIC结束信号
+    ******************************************/
+    void IIC_Stop(void)
+    {
+        SDA_OUT();
+        IIC_SDA=0;
+        IIC_SCL=0;
+        delay_us(4);
+        IIC_SDA=1; //STOP:when CLK is low,SDA change from low to high
+        IIC_SCL=1; //发送I2C总线结束信号
+        delay_us(4);
+    }
+
+
+    /******************************************
+    *函数原型： void IIC_Wait_Ack(void)
+    *功能： 等待应答信号到来
+    *输出； 1，接收应答失败
+           0，接收应答成功
+    ******************************************/
+    u8 IIC_Wait_Ack(void)
+    {
+        u8 ucErrTime = 0;
+        SDA_IN();
+        IIC_SDA=1;
+        delay_us(1);
+        IIC_SCL=1;
+        delay_us(1);
+        while(IIC_SDA) //最多等待50us
+        {
+            ucErrTime++;
+            if(ucErrTime>50)
+            {
+                IIC_Stop();
+                return 1;
+            }
+            delay_us(1);
+        }
+        IIC_SCL=0; //时钟输出0
+        return 0;
+    }
+
+    /******************************************
+    *函数原型： void IIC_Ack(void)
+    *功能： 产生ACK应答信号SDA=0
+    ******************************************/
+    void IIC_Ack(void)
+    {
+        IIC_SCL=0;
+        SDA_OUT();
+        IIC_SDA=0;
+        delay_us(1);
+        IIC_SCL=1;
+        delay_us(1);
+        IIC_SCL=0;
+    }
+
+    /******************************************
+    *函数原型： void IIC_Ack(void)
+    *功能： 产生ACK应答信号SDA=0
+    ******************************************/
+    void IIC_NAck(void)
+    {
+        IIC_SCL=0;
+        SDA_OUT();
+        IIC_SDA=1;
+        delay_us(1);
+        IIC_SCL=1;
+        delay_us(1);
+        IIC_SCL=0;
+    }
+
+
+    /****************************************************
+    *函数原型： u8 IICwriteBytes(u8 dev, u8 reg, u8 length, u8 *data)
+    *功能： 将多个字节写入指定设备 指定寄存器
+    *输入： dev 目标设备地址
+    * reg 寄存器地址
+    * length 要写的字节数
+    * *data 将要写的数据的首地址
+    *返回： 返回是否成功，1成功
+    ****************************************************/
+    u8 IICwriteBytes(u8 dev, u8 reg, u8 length, u8 *data)
+    {
+        u8 count = 0;
+        IIC_Start();
+        IIC_Send_Byte(dev); //发送写命令
+        IIC_Wait_Ack();
+        IIC_Send_Byte(reg); //发送写入的地址
+        IIC_Wait_Ack();
+        for(count=0;count<length;count++)
+        {
+            IIC_Send_Byte(data[count]);
+            IIC_Wait_Ack();
+        }
+        IIC_Stop(); //发送停止信号
+        
+        return 1;
+    }
+
+    /******************************************
+    *函数原型： u8 IIC_Read_Byte(unsigned char ack)
+    *功能： 读取一个Byte的字节
+    *输入： 读取一个字节,ack=1,发送ACK,ack=0,发送nACK
+    *返回： 读取到的Byte
+    ******************************************/
+    u8 IIC_Read_Byte(unsigned char ack)
+    {
+        unsigned char i, receive = 0;
+        SDA_IN(); //设置为输入
+        for(i=0;i<8;i++)
+        {
+            IIC_SCL=0;
+            delay_us(1);
+            IIC_SCL=1;
+            receive<<=1;
+            if(READ_SDA) receive++;
+            delay_us(1);
+        }
+        if(ack)
+            IIC_Ack(); //发送ACK
+        else
+            IIC_NAck(); //发送NACK
+        
+        return receive;    
+    }
+
+
+
+    /****************************************************
+    *函数原型： u8 IICwriteBits(u8 dev, u8 reg, u8 bitStart, u8 length, u8 data)
+    *功能： 读、修改、写指定设备、指定寄存器一个字节中的多个位
+    *输入： dev 目标设备地址
+    * reg 寄存器地址
+    * bitStart 目标字节的起始位,自左向右？
+    * length 位长度
+    * data 存放改变目标字节位的值
+    *返回： 返回是否成功，1成功
+    ****************************************************/
+    u8 IICwriteBits(u8 dev, u8 reg, u8 bitStart, u8 length, u8 data)
+    {
+        u8 b;
+        u8 mask;
+        if(IICreadByte(dev, reg, &b) != 0)
+        {
+            mask = (0xFF << (bitStart +1))| 0xFF >> ((8 - bitStart) + length -1);
+            data >>= (7 - bitStart);
+            b &= mask;
+            b |= data;
+            return IICwriteByte(dev, reg, b);
+        } else {
+            return 0;
+        }
+    }
+
+
+
+
+
