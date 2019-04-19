@@ -1,3 +1,12 @@
+/*****************************
+void judge_gesture(GESTURE *g)//判断姿势
+void Angle_get()//计算角度
+void Kalman_Filter(double angle_m, double gyro_m)//卡尔曼滤波
+void tcpsend_procceed(char test[16] , float data, int i, int j, int m)//tcp传输
+*****************************/
+
+
+
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include <SoftwareSerial.h> //软件串口
@@ -17,7 +26,7 @@ int choose = 0;
 #define C2 3
 
 int16_t ax, ay, az, gx, gy, gz;
-//int16_t data[8][8];
+int16_t data[8][8];
 
 float axt, ayt, azt;
 
@@ -49,36 +58,28 @@ float timeChange = 10; //滤波法采样时间间隔毫秒
 float dt = timeChange * 0.003; //注意：dt的取值为滤波器采样时间
 //***************Kalman_Filter*********************//
 
-
-
- #define MIDDLE_UP 15
-#define MIDDLE_DOWN -25
-#define MAX_UP 37 //定义判定为向上翻手的临界值
-#define MAX_DOWN -50 //定义判定为向下翻手的临界值
 #define UP 1//定义姿势状态整形参数 1：向上 2：向下 3：中等向上 4：中等向下
 #define DOWN 2
-#define M_UP 3
-#define M_DOWN 4
-#define RIGHT 2
-#define LEFT 1
-#define MIDDLE_RIGHT 30
-#define MIDDLE_LEFT -30
-#define MAX_RIGHT 60
-#define MAX_LEFT -60
-#define M_RIGHT 4
-#define M_LEFT 3
+#define RIGHT 1
+#define LEFT 2
+//以下应用在新版本V1.1级以上
+#define LITTLE_UP 10//定义可检测到的敏感角度 10°
+#define LITTLE_DOWN -10
+#define LITTLE_LEFT -10
+#define LITTLE_RIGHT 10
+/////////////////////////////////////////////////////////
 float sum_pitch=0.0f;//多次pitch角的和
 float ave_pitch=0.0f;//picth角的平均值
 float sum_roll=0.0f;
 float ave_roll=0.0f;
 int count=0;//定义计数器
-
 typedef struct gesture
 {
   float up_down;//上下参数
   float left_right;//左右参数
   float pitch;//俯仰角
   float roll;//翻滚角
+  int equipment;//设备号
 }GESTURE;
 //****************MPU6050数据结构体************************//
 typedef struct device
@@ -93,12 +94,7 @@ typedef struct device
   int equipment;
   
 }DEVICE;
-
- GESTURE real_gesture;
-  DEVICE device[6];
-  
-
-
+DEVICE device[6];
 void Angle_get()
 {
   //平衡参数
@@ -172,37 +168,24 @@ mySerial.write(35);//ASCLL #井号
 void tcpsend_procceed(char test[16] , float data, int i, int j, int m)
 {
  
-  //i转换后整数部分长度
-  //j转换后小数部分长度
-  //m传入数据长度ascll m<8
- // mySerial.write(str,2);           
- 
-  dtostrf(data,i, j, test);//保存到该char数组中。
-  //dtostrf(signalsign,2, 0, test1);//保存到该char数组中。
-  
-
- for( i = 0; i < m; i++)
-  {
-  mySerial.write(test[i]);//ASCLL 向esp8266写数据
-  //delay(5);
-  }
-  //mySerial.write(35);//ASCLL #井号,分隔符
-  test[16] = {0};//reset char
-  }
-void getdata(void)
-{
-  for(count = 0;count <5;count++)
-    {
-      mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);     //IIC获取MPU6050六轴数据 ax ay az gx gy gz  
-     
-      Angle_get();                                      //获取angle 角度和卡曼滤波
-    
-          //求平均数，判断姿势
-          //getsum(angle6,angle);
-          sum_pitch+=angle6;
-          sum_roll+=angle;
-    }
+        //i转换后整数部分长度
+        //j转换后小数部分长度
+        //m传入数据长度ascll m<8
+       // mySerial.write(str,2);           
+       
+        dtostrf(data,i, j, test);//保存到该char数组中。
+        //dtostrf(signalsign,2, 0, test1);//保存到该char数组中。
+        
+      
+       for( i = 0; i < m; i++)
+        {
+        mySerial.write(test[i]);//ASCLL 向esp8266写数据
+        //delay(5);
+        }
+        //mySerial.write(35);//ASCLL #井号,分隔符
+        test[16] = {0};//reset char
 }
+
 void transmit(GESTURE *g)//发送数据
 {
   //transmit
@@ -218,43 +201,10 @@ void transmit(GESTURE *g)//发送数据
        mySerial.write(35);//ASCLL #井号*/
        tcpsend_procceed(test , g->pitch, 3, 2, 5);
        mySerial.write(33);//ASCLL !号，结束符
-}  
- 
-void setup() {
-  Wire.begin();                            //加入 I2C 总线序列
-  Serial.begin(9600);                       //开启串口，设置波特率
-  mySerial.begin(9600); 
-  delay(1000);
-  mpu.initialize();                       //初始化MPU6050
-  
-  
-
-  pinMode(C1,OUTPUT);
-  pinMode(C2,OUTPUT);
-  
-  digitalWrite(C1,LOW);//默认从手背开始
-  digitalWrite(C2,HIGH);
 }
- 
-void loop() 
+void getdata(void)
 {
-    while(mySerial.available())           //从esp8266读数据
-  {
-    Serial.write(mySerial.read());
-  }
-  
-  //int i;//定义临时循环变量
-  
-       //recive
-         while(mySerial.available())           //从esp8266读数据
-  {
-    Serial.write(mySerial.read());
-  }
-  
- 
-    getdata();
-    
-    /*for(count = 0;count <5;count++)
+  for(count = 0;count <5;count++)
     {
       mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);     //IIC获取MPU6050六轴数据 ax ay az gx gy gz  
      
@@ -264,7 +214,42 @@ void loop()
           //getsum(angle6,angle);
           sum_pitch+=angle6;
           sum_roll+=angle;
-    }*/
+    }
+}
+ 
+void setup() 
+{
+    Wire.begin();                            //加入 I2C 总线序列
+    Serial.begin(9600);                       //开启串口，设置波特率
+    mySerial.begin(9600); 
+    delay(1000);
+    mpu.initialize();                       //初始化MPU6050
+  
+    pinMode(C1,OUTPUT);
+    pinMode(C2,OUTPUT);
+    
+    digitalWrite(C1,LOW);//默认从手背开始
+    digitalWrite(C2,HIGH);
+}
+ 
+void loop() 
+{
+      while(mySerial.available())           //从esp8266读数据
+      {
+        Serial.write(mySerial.read());
+      }
+      
+      
+           //recive
+       while(mySerial.available())           //从esp8266读数据
+      {
+        Serial.write(mySerial.read());
+      }
+  
+ 
+
+    GESTURE real_gesture;
+    getdata();
       
       //手背
       if( choose == 0)//choose 实际是0，定义choose=0 为手背
@@ -274,12 +259,13 @@ void loop()
          azt = float(az) / 2048;
 
  
-        /*Serial.print("ax: ");Serial.print(axt);Serial.print(",");
+        Serial.print("ax: ");Serial.print(axt);Serial.print(",");
         Serial.print("ay: ");Serial.print(ayt);Serial.print(",");
-        Serial.print("az: ");Serial.print(azt);Serial.print("---");*/
+        Serial.print("az: ");Serial.print(azt);Serial.print("---");
          
-         Serial.print("roll: ");Serial.print(angle_dot);Serial.print(",");
-         Serial.print("pitch: ");Serial.println(angle6);
+        Serial.print("angle: ");Serial.print(angle);Serial.print(",");
+        Serial.print("angle_dot: ");Serial.print(angle_dot);Serial.print(",");
+        Serial.print("angle6: ");Serial.println(angle6);
          judge_gesture(&real_gesture);//获取姿势参数
          count=0;//进行初始化操作
          sum_pitch=0;
@@ -288,7 +274,7 @@ void loop()
          Serial.print("\t");
          Serial.print(real_gesture.left_right);
          Serial.print("\t");
-         Serial.print(angle);
+         Serial.print(real_gesture.pitch);
          Serial.print("\n");
 
          transmit(&real_gesture);//调用发送数据函数
@@ -302,43 +288,14 @@ void loop()
       azt = float(az) / 2048;
 
  
-      /*Serial.print("ax: ");Serial.print(axt);Serial.print(",");
+      Serial.print("ax: ");Serial.print(axt);Serial.print(",");
       Serial.print("ay: ");Serial.print(ayt);Serial.print(",");
-      Serial.print("az: ");Serial.print(azt);Serial.print("---");*/
+      Serial.print("az: ");Serial.print(azt);Serial.print("---");
        
-      Serial.print("yaw: ");Serial.print(angle);Serial.print(",");
-      Serial.print("roll: ");Serial.print(angle_dot);Serial.print(",");
-      Serial.print("pitch: ");Serial.println(angle6);
+      Serial.print("angle: ");Serial.print(angle);Serial.print(",");
+      Serial.print("angle_dot: ");Serial.print(angle_dot);Serial.print(",");
+      Serial.print("angle6: ");Serial.println(angle6);
       }
-       
-  
-
-//velocity
-        velocity = -1 * angle6 / 10 + 9;//-9 - +9档位 -》 0-18
-        if(velocity < 0)
-        {
-          velocity = 0;
-        }
-        if(velocity > 18)
-        {
-          velocity = 18;
-        }
-  
-  /*//transmit
-       mySerial.write(36);//ASCLL $号,占位符
-       mySerial.write(64);//ASCLL @号,标志符
-       tcpsend_procceed(test , 1.0, 1, 0, 2);//设备编号
-       mySerial.write(35);//ASCLL #井号，分隔符
-       tcpsend_procceed(test , real_gesture.up_down, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , real_gesture.left_right, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , velocity, 2, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , angle, 3, 2, 5);
-       mySerial.write(33);//ASCLL !号，结束符*/
-       
-       
        
   //可视化分析
   /*
@@ -363,7 +320,6 @@ void loop()
   Serial.print("angle_dot: ");Serial.print(angle_dot);Serial.print(",");
   Serial.print("angle6: ");Serial.println(angle6);
   */
-  //****************************************//
    if(choose == 0)//选择
   {
   digitalWrite(C1,HIGH);
@@ -394,19 +350,13 @@ void judge_gesture(GESTURE *g)//判断姿势，返回值为 1234 ，1：向上�
 {
   ave_pitch=sum_pitch/count;
   ave_roll=sum_roll/count;
-  if(ave_pitch>=MIDDLE_UP&&ave_pitch<=MAX_UP)//判定角度，如果大于25°,小于45,则向中上，此处可更改
-  {
-    g->up_down=M_UP;
-  }
-  else if(ave_pitch<=MIDDLE_DOWN&&ave_pitch>=MAX_DOWN)
-  {
-    g->up_down=M_DOWN;
-  }
-  else if(ave_pitch>MAX_UP)
+  g->pitch=ave_pitch;//角度值赋值
+  g->roll=ave_roll;//需要发送
+  if(ave_pitch>=LITTLE_UP)//判定角度，如果大于25°,小于45,则向中上，此处可更改
   {
     g->up_down=UP;
   }
-  else if(ave_pitch<MAX_DOWN)
+  else if(ave_pitch<=LITTLE_DOWN)
   {
     g->up_down=DOWN;
   }
@@ -414,19 +364,11 @@ void judge_gesture(GESTURE *g)//判断姿势，返回值为 1234 ，1：向上�
   {
     g->up_down=0;
   }
-  if(ave_roll>=MIDDLE_RIGHT&&ave_roll<=MAX_RIGHT)//判定角度，如果x向右大于25°,小于45,则向中右，此处可更改
-  {
-    g->left_right=M_RIGHT;
-  }
-  else if(ave_roll<=MIDDLE_LEFT&&ave_roll>=MAX_LEFT)
-  {
-    g->left_right=M_LEFT;
-  }
-  else if(ave_roll>MAX_RIGHT)
+  if(ave_roll>=LITTLE_RIGHT)//判定角度，如果x向右大于25°,小于45,则向中右，此处可更改
   {
     g->left_right=RIGHT;
   }
-  else if(ave_roll<MAX_LEFT)
+  else if(ave_roll<=LITTLE_LEFT)
   {
     g->left_right=LEFT;
   }
