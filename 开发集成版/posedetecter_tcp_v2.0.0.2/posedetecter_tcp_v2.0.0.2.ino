@@ -278,6 +278,7 @@ void loop()
         Serial.print("ay: ");Serial.print(ayt);Serial.print(",");
         Serial.print("az: ");Serial.print(azt);Serial.print("---");*/
          
+         Serial.print("yaw: ");Serial.print(angle);Serial.print(",");
          Serial.print("roll: ");Serial.print(angle_dot);Serial.print(",");
          Serial.print("pitch: ");Serial.println(angle6);
          judge_gesture(&real_gesture);//获取姿势参数
