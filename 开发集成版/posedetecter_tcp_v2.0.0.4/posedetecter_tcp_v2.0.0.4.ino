@@ -84,12 +84,13 @@ typedef struct gesture
 //****************MPU6050数据结构体************************//
 typedef struct device
 {
-  float ax;//上下参数
-  float ay;//上下参数
-  float az;//上下参数
- float gx;//上下参数
-  float gy;//上下参数
-  float gz;//上下参数
+  float ax;//参数
+  float ay;//参数
+  float az;//参数
+  
+  float gx;//参数
+  float gy;//参数
+  float gz;//参数
   
   float yaw;//偏航角
   float pitch;//俯仰角
@@ -189,7 +190,7 @@ void tcpsend_procceed(char test[16] , float data, int i, int j, int m)
         test[16] = {0};//reset char
 }
 
-void transmit(GESTURE *g)//发送数据
+void transmit_1(GESTURE *g)//发送数据
 {
   //transmit
        mySerial.write(36);//ASCLL $号,占位符
@@ -199,6 +200,28 @@ void transmit(GESTURE *g)//发送数据
        tcpsend_procceed(test , g->up_down, 1, 0, 2);
        mySerial.write(35);//ASCLL #井号
        tcpsend_procceed(test , g->left_right, 1, 0, 2);
+       mySerial.write(35);//ASCLL #井号
+       tcpsend_procceed(test , g->roll, 1, 0, 2);
+       mySerial.write(35);//ASCLL #井号
+       /*tcpsend_procceed(test , velocity, 2, 0, 2);
+       mySerial.write(35);//ASCLL #井号*/
+       tcpsend_procceed(test , g->pitch, 3, 2, 5);
+       mySerial.write(33);//ASCLL !号，结束符
+}
+void transmit_2(DEVICE *g)//发送数据,另设一个发送函数,未修改完
+{
+  //transmit
+       mySerial.write(36);//ASCLL $号,占位符
+       mySerial.write(64);//ASCLL @号,标志符
+       tcpsend_procceed(test , 1.0, 1, 0, 2);//发送数据包类型判断
+       mySerial.write(35);//ASCLL #井号，分隔符
+       tcpsend_procceed(test , 1.0, 1, 0, 2);//设备编号
+       mySerial.write(35);//ASCLL #井号，分隔符
+       tcpsend_procceed(test , g->up_down, 1, 0, 2);
+       mySerial.write(35);//ASCLL #井号
+       tcpsend_procceed(test , g->left_right, 1, 0, 2);
+       mySerial.write(35);//ASCLL #井号
+       tcpsend_procceed(test , g->roll, 1, 0, 2);
        mySerial.write(35);//ASCLL #井号
        /*tcpsend_procceed(test , velocity, 2, 0, 2);
        mySerial.write(35);//ASCLL #井号*/
@@ -226,12 +249,16 @@ void getdata(int num)
       device[num].ax = ax;
       device[num].ay = ay;
       device[num].az = az;
+      
       device[num].gx = gx;
       device[num].gy = gy;
       device[num].gz = gz;
+      
       device[num].yaw = angle ;
       device[num].roll = angle_dot;
       device[num].pitch = angle6; 
+
+      device[num].equipment = num;
 }
  
 void setup() 
@@ -272,6 +299,7 @@ void loop()
       if( choose == 0)//choose 实际是0，定义choose=0 为手背
        {
          getdata(0);
+         
          axt = float(ax) / 2048 ;
          ayt = float(ay) / 2048 ;
          azt = float(az) / 2048;
@@ -285,6 +313,7 @@ void loop()
         Serial.print("angle_dot: ");Serial.print(angle_dot);Serial.print(",");
         Serial.print("angle6: ");Serial.println(angle6);
          judge_gesture(&real_gesture);//获取姿势参数
+         real_gesture.equipment = 0;
          count=0;//进行初始化操作
          sum_pitch=0;
          sum_roll=0;
@@ -295,13 +324,14 @@ void loop()
          Serial.print(real_gesture.pitch);
          Serial.print("\n");
 
-         transmit(&real_gesture);//调用发送数据函数
+         transmit_1(&real_gesture);//调用发送数据函数
          //delay(20);
        }
     //大拇指
     else if(choose == 1)
     {
       getdata(1);
+      //real_gesture.equipment = 0;
       axt = float(ax) / 2048 ;
       ayt = float(ay) / 2048 ;
       azt = float(az) / 2048;
