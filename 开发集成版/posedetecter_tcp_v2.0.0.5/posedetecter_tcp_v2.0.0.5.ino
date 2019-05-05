@@ -374,6 +374,7 @@ void loop()
 //夹角分析
       angle_calculate(acc_angle ,device[0].yaw, device[0].roll, device[0].pitch,device[1].yaw, device[1].roll, device[1].pitch);
       Serial.print("夹角");Serial.print(acc_angle[0]);Serial.print(acc_angle[1]);Serial.print(acc_angle[2]);Serial.print(acc_angle[3]);Serial.println(acc_angle[4]);
+      /*****留空******/
       
   //可视化分析
   /*
