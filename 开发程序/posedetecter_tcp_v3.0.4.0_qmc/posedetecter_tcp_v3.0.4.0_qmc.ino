@@ -241,12 +241,13 @@ void tcpsend_procceed(char test[16] , float data, int i, int j, int m)
         test[16] = {0};//reset char
 }
 
+//下次测试若无分隔符传输情况
+
 void transmit_1(GESTURE *g)//发送数据
 {
   //transmit
        mySerial.write(36);//ASCLL $号,占位符
-       mySerial.write(64);//ASCLL @号,标志符
-       tcpsend_procceed(test , 1.0, 1, 0, 2);//设备编号
+       mySerial.write(64);//ASCLL @号,通讯标志符，便于上位机确定数据包类型
        mySerial.write(35);//ASCLL #井号，分隔符
        tcpsend_procceed(test , g->up_down, 1, 0, 2);
        mySerial.write(35);//ASCLL #井号
@@ -259,26 +260,34 @@ void transmit_1(GESTURE *g)//发送数据
        tcpsend_procceed(test , g->roll, 3, 2, 5);
        mySerial.write(33);//ASCLL !号，结束符
 }
-/*void transmit_2(DEVICE *g)//发送数据,另设一个发送函数,未修改完
+void transmit_2(char sign, uint8_t instruction)//发送数据,第二类发送
 {
+  /*0：故障
+   * 1：原路返回
+   * 2：开灯
+   * 3：。。。
+   */       
+   mySerial.write(36);//ASCLL $号,占位符，没有任何意义,但不能删
+
+   mySerial.write(63);//ASCLL ?号,通讯标志符，便于上位机确定数据包类型
+  if(instruction == 0)
+  {
+      ; //若故障，提醒初始化,
+     
+    }
   //transmit
-       mySerial.write(36);//ASCLL $号,占位符
-       mySerial.write(64);//ASCLL @号,标志符
-       tcpsend_procceed(test , 1.0, 1, 0, 2);//发送数据包类型判断
+        tcpsend_procceed(test , sign, 1, 0, 1);//ASCLL 应用层标志符，自定义
+        
        mySerial.write(35);//ASCLL #井号，分隔符
-       tcpsend_procceed(test , 1.0, 1, 0, 2);//设备编号
-       mySerial.write(35);//ASCLL #井号，分隔符
-       tcpsend_procceed(test , g->up_down, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , g->left_right, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , g->roll, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , velocity, 2, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , g->pitch, 3, 2, 5);
+       
+        mySerial.write(43);//ASCLL +号
+        
+         mySerial.write(35);//ASCLL #井号，分隔符
+       
+       
+       tcpsend_procceed(test , instruction, 1, 0, 1);//发送指令
        mySerial.write(33);//ASCLL !号，结束符
-}*/
+}
 void Get_QMC5883_mpu6050()
 {
   
@@ -424,7 +433,7 @@ uint8_t getAddress(uint8_t addr) {
     I2Cdev::readByte(0x68, addr, temphex);
     return temphex[0];
 }
-void Get_i2cdump(uint8_t num)//display all register data,(debug)
+void Get_i2cdump(uint8_t num)//display all register data,(usedfor debug)
 {
   
     for(int8_t count = 0; count < num; count++){
@@ -632,11 +641,6 @@ void loop()
       //Serial.print(mpu.getSlaveAddress(0),HEX);
       //Get_i2cdump(127);
        
-      while(mySerial.available())           //从esp8266读数据
-      {
-        Serial.write(mySerial.read());
-      }
-
 
            //recive
        while(mySerial.available())           //从esp8266读数据
