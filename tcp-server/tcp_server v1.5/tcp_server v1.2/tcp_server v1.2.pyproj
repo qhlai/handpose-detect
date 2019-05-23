@@ -21,9 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\tcp_server v1.5\tcp_server v1.2\tcp_server v1.2.sln">
-      <Link>tcp_server v1.2.sln</Link>
-    </Compile>
+    <Compile Include="tcp_server_v1.2.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

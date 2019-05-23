@@ -247,17 +247,18 @@ void transmit_1(GESTURE *g)//发送数据
 {
   //transmit
        mySerial.write(36);//ASCLL $号,占位符
-       mySerial.write(64);//ASCLL @号,通讯标志符，便于上位机确定数据包类型
-       mySerial.write(35);//ASCLL #井号，分隔符
-       tcpsend_procceed(test , g->up_down, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , g->left_right, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
-       tcpsend_procceed(test , g->pitch, 1, 0, 2);
-       mySerial.write(35);//ASCLL #井号
+       
+       mySerial.write(64);//ASCLL @号,通讯标志符，便于上位机确定数据包类型 0
+       mySerial.write(35);//ASCLL #井号，分隔符 1
+       tcpsend_procceed(test , g->up_down, 1, 0, 2);//2 3
+       mySerial.write(35);//ASCLL #井号 4
+       tcpsend_procceed(test , g->left_right, 1, 0, 2);//5 6
+       mySerial.write(35);//ASCLL #井号 7
+       tcpsend_procceed(test , g->pitch, 3, 2, 5);//8 9 10 11 12
+       mySerial.write(35);//ASCLL #井号13
        /*tcpsend_procceed(test , velocity, 2, 0, 2);
        mySerial.write(35);//ASCLL #井号*/
-       tcpsend_procceed(test , g->roll, 3, 2, 5);
+       tcpsend_procceed(test , g->roll, 3, 2, 5);//13 14 15 16 17 
        mySerial.write(33);//ASCLL !号，结束符
 }
 void transmit_2(char sign, uint8_t instruction)//发送数据,第二类发送
@@ -277,7 +278,6 @@ void transmit_2(char sign, uint8_t instruction)//发送数据,第二类发送
     }
   //transmit
         tcpsend_procceed(test , sign, 1, 0, 1);//ASCLL 应用层标志符，自定义
-        
        mySerial.write(35);//ASCLL #井号，分隔符
        
         mySerial.write(43);//ASCLL +号
