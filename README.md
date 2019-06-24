@@ -1,4 +1,4 @@
-﻿# handpose-detect-arduino-mpu6050
+﻿# handpose-detect-arduino-mpu6050-qmc5883
 
 
 立项
