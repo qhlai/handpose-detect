@@ -1,0 +1,81 @@
+[2019-03-25 21:55:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-25 23:01:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-25 23:11:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-25 23:16:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-27 22:11:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-27 22:20:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-27 23:30:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-27 23:37:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-03-27 23:40:Program Success:34FF6D064D55383719411543 E:\git\.git\handpose-detect-arduino-mpu6050\car\1.舵机转向小车源码V2 - 副本\OBJ\Minibalance.hex
+[2019-06-30 22:14:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:32:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:36:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:40:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:45:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:46:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:48:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:52:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:54:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:55:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 22:57:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-06-30 23:02:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:13:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:15:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:16:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:18:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:19:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:25:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:26:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:31:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:33:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:34:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:36:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:39:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:40:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:46:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:53:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:55:日志记录不属免费功能,请注册支持作者改进软件
+[2019-06-30 23:59:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-01 00:01:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-01 00:03:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-01 00:07:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-01 00:10:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-01 00:11:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-01 00:12:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-01 00:14:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 15:39:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 15:41:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 15:51:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 15:58:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:15:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:17:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:17:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:19:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:20:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:22:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:23:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:25:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:26:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:28:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:29:日志记录不属免费功能,请注册支持作者改进软件
+[2019-07-02 16:30:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 16:31:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 16:32:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 16:33:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 16:37:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 16:38:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 17:23:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 17:24:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 18:01:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 18:05:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 18:08:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 18:24:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 18:29:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 18:35:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 18:41:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-02 19:25:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3\OBJ\Minibalance.hex
+[2019-07-07 14:03:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
+[2019-07-07 15:17:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
+[2019-07-07 15:21:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
+[2019-07-07 15:23:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
+[2019-07-07 15:49:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
