@@ -85,31 +85,62 @@ void Kalman_Filter(double angle_m, double gyro_m)
   q_bias += K_1 * angle_err;///更新最优估计值的偏差
   angle_dot = gyro_m - q_bias; ///更新最优角速度值
 }
+      /*************************************************
+      * 函数
+      * 功能：交换
+      **************************************************/
+      void swap(float *a,float *b) 
+      {
+          float temp = *a;
+          *a = *b;
+          *b = temp;
+      }
+
      /*************************************************
-      * 功能：获取指定超声波数据，并保存
+      * 功能：获取指定超声波数据，超声波测距滤波，并保存
       **************************************************/
     void Get_Distance(int i, float *distance)
     {
-            float tempdistance;
-            // 产生一个10us的高脉冲去触发TrigPin
-            digitalWrite(TrigPin[i], LOW);
-            delayMicroseconds(2);
-            digitalWrite(TrigPin[i], HIGH);
-            delayMicroseconds(10);
-            digitalWrite(TrigPin[i], LOW);
-            //检测脉冲宽度，并计算出距离
-            tempdistance = pulseIn(EchoPin[i], HIGH) / 58.00;
-            if(tempdistance>400)
+            float tempdistance[8];
+            float avg_distance;
+            int m = 0;
+            //获取8个数据
+            do
             {
-              distance[i]= 400;
-             }
-             else if(tempdistance<4)
-             {
-                distance[i]= 4;
-             }
-            else
-            {distance[i]= tempdistance;}
-            
+                // 产生一个10us的高脉冲去触发TrigPin
+                digitalWrite(TrigPin[i], LOW);
+                delayMicroseconds(2);
+                digitalWrite(TrigPin[i], HIGH);
+                delayMicroseconds(10);
+                digitalWrite(TrigPin[i], LOW);
+                //检测脉冲宽度，并计算出距离
+                tempdistance[m] = pulseIn(EchoPin[i], HIGH) / 58.00;
+                if( tempdistance[m]>400)
+                {
+                   tempdistance[m]=400;
+                 }
+                if( tempdistance[m]<4)
+                 {
+                     tempdistance[m]= 4;
+                 }
+                  m++;
+            }while(m <8);
+            //排序
+            for (int s = 0 ; s < 8 - 1 ; s++) 
+            {
+            int mindata = s;
+            for (int j = s + 1; j < 8; j++)     
+                if (tempdistance[j] < tempdistance[mindata])    
+               mindata = j;    
+               swap(&tempdistance[mindata], &tempdistance[s]);    
+            }
+            //求和平均
+            int sum=0;
+            for(int s= 1;s < 7 ; s++)
+            {
+            sum += tempdistance[s];
+            }
+            distance[i]= sum / 6;
    }
       /*************************************************
       * 功能：获取所有超声波数据，并保存
@@ -122,9 +153,9 @@ void Kalman_Filter(double angle_m, double gyro_m)
           }
     }
      /*************************************************
-      * 功能：pid
+      * 功能：pid,没有必要
       **************************************************/
-      #define PERIOD 20
+      /*#define PERIOD 20
       float u = 0;
       float eI;
       float eII;
@@ -151,7 +182,7 @@ void Kalman_Filter(double angle_m, double gyro_m)
         }
         output = u;
         return output;
-      }
+      }*/
        /*************************************************
       * 函数
       * 功能：展示所有超声波数据
