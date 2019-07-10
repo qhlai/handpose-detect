@@ -36,6 +36,55 @@
             pinMode(EchoPin[5], INPUT);*/
         Serial.println("Ultrasonic sensor:");
     }
+/*************************************************
+  * 功能：滤波
+  **************************************************/
+    
+float P[2][2] = {{ 1, 0 },
+  { 0, 1 }
+};
+float Pdot[4] = { 0, 0, 0, 0};
+//float Q_angle = 0.001, Q_gyro = 0.005; //角度数据置信度,角速度数据置信度
+float Q_angle = 2, Q_gyro = 2; //角度数据置信度,角速度数据置信度
+float R_angle = 0.5 , C_0 = 1;
+float q_bias, angle_err, PCt_0, PCt_1, E, K_0, K_1, t_0, t_1;
+float timeChange = 10; //滤波法采样时间间隔毫秒
+float dt = timeChange * 0.003; //注意：dt的取值为滤波器采样时间
+////////////////////////kalman/////////////////////////
+float angle, angle_dot;                                //平衡角度值
+void Kalman_Filter(double angle_m, double gyro_m)
+{
+  ///陀螺仪积分角度（先验估计）
+  angle += (gyro_m - q_bias) * dt;//带q的是变量的协方差，带m的是测量值
+  ///计算角度偏差
+  angle_err = angle_m - angle;//偏差e
+  ///先验估计误差协方差的微分
+  Pdot[0] = Q_angle - P[0][1] - P[1][0];
+  Pdot[1] = - P[1][1];
+  Pdot[2] = - P[1][1];
+  Pdot[3] = Q_gyro;
+  ///先验估计误差协方差的积分
+  P[0][0] += Pdot[0] * dt;
+  P[0][1] += Pdot[1] * dt;
+  P[1][0] += Pdot[2] * dt;
+  P[1][1] += Pdot[3] * dt;
+  ///卡尔曼增益计算
+  PCt_0 = C_0 * P[0][0];
+  PCt_1 = C_0 * P[1][0];
+  E = R_angle + C_0 * PCt_0;
+  K_0 = PCt_0 / E;
+  K_1 = PCt_1 / E;
+  ///后验估计误差协方差计算 
+  t_0 = PCt_0;
+  t_1 = C_0 * P[0][1];
+  P[0][0] -= K_0 * t_0;
+  P[0][1] -= K_0 * t_1;
+  P[1][0] -= K_1 * t_0;
+  P[1][1] -= K_1 * t_1;
+  angle += K_0 * angle_err; ///后验估计最优角度值
+  q_bias += K_1 * angle_err;///更新最优估计值的偏差
+  angle_dot = gyro_m - q_bias; ///更新最优角速度值
+}
      /*************************************************
       * 功能：获取指定超声波数据，并保存
       **************************************************/
@@ -197,7 +246,7 @@
                Car_Angle_Set = 15;
               }
      }
-      eles if(distance[0]< 15)//前
+      else if(distance[0]< 15)//前
        {
             Car_Velocity_Set = 5;
             Car_Angle_Set = 0;
@@ -217,7 +266,7 @@
                  Car_Angle_Set = 30;
                 }
         }
-        eles if(distance[0]< 5)//前
+        else if(distance[0]< 5)//前
        {
             Car_Velocity_Set = -5;
             Car_Angle_Set = 0;
@@ -237,10 +286,75 @@
                  Car_Angle_Set = 45;
                 }
         }
+        /*************************************************
+      * 设备：前置超声波，右超声波双 融合
+      * 功能：左斜将碰墙时自动纠偏
+      * 备注：舵机右正左负
+      **************************************************/
+     if(distance[0]< 30)//前
+     {
+       //Car_Velocity_Set = 10;
+      // Car_Angle_Set = 0;
+           if(distance[2]< 25)//左
+                {
+                    Car_Velocity_Set = 5;
+                    Car_Angle_Set = -5;
+                }
+            else if(distance[1]< 15)//左
+            {
+               Car_Velocity_Set = 5;
+               Car_Angle_Set = -10;
+              }
+              else if(distance[1]< 8)//左
+            {
+               Car_Velocity_Set = 5;
+               Car_Angle_Set = -15;
+              }
+     }
+      else if(distance[0]< 15)//前
+       {
+            Car_Velocity_Set = 5;
+            Car_Angle_Set = 0;
+                 if(distance[2]< 25)//右
+                  {
+                      Car_Velocity_Set = 5;
+                      Car_Angle_Set = -20;
+                  }
+                else if(distance[2]< 15)//右
+                {
+                 Car_Velocity_Set = 5;
+                 Car_Angle_Set = -20;
+                }
+                else if(distance[2]< 8)//右
+                {
+                 Car_Velocity_Set = 5;
+                 Car_Angle_Set = -30;
+                }
+        }
+        else if(distance[0]< 5)//前
+       {
+            Car_Velocity_Set = -5;
+            Car_Angle_Set = 0;
+                 if(distance[2]< 25)//右
+                 {
+                      Car_Velocity_Set = 5;
+                      Car_Angle_Set = -20;
+                 }
+                  else if(distance[2]< 15)//右
+                {
+                 Car_Velocity_Set = 5;
+                 Car_Angle_Set = -30;
+                }
+                else if(distance[2]< 8)//右
+                {
+                 Car_Velocity_Set = 5;
+                 Car_Angle_Set = -45;
+                }
+        }
     }
     void loop()
     {
       Get_All_Distance(4);
       Display(4);
-      Avoid_Obstacle()
+      Avoid_Obstacle();
     }
