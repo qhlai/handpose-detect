@@ -74,7 +74,7 @@ int16_t data[8][8];
 
 float acc_angle[4];//向量计算出的值，三维夹角，x方向夹角，y方向，z方向
 
-float axt, ayt, azt;
+//float axt, ayt, azt;
 
 
 //********************angle data*********************//
@@ -92,8 +92,9 @@ float accelz = 0;
 
 /*************************************************
       * 定义
-      * 功能：卡尔曼滤波Kalman_Filter
+      * 功能：卡尔曼滤波
 **************************************************/
+//***************Kalman_Filter*********************//
 float P[2][2] = {{ 1, 0 },
   { 0, 1 }
 };
@@ -126,12 +127,10 @@ float Mx,My,Mz;//以特斯拉为单位的转换后的磁场强度
 #define LITTLE_LEFT -10
 #define LITTLE_RIGHT 10
 /////////////////////////////////////////////////////////
-float sum_pitch=0.0f;//多次pitch角的和
-float ave_pitch=0.0f;//picth角的平均值
-float sum_roll=0.0f;
-float ave_roll=0.0f;
+
+
 float pre_arr[3][11]={0};
-int count=0;//定义计数器
+
 int counter=0;//定义翻手计数器
 
 typedef struct gesture
@@ -189,17 +188,15 @@ void Angle_get()
   angle6 = K1 * angleAx + (1 - K1) * (angle6 + Gyro_y * dt);
 }
 
-/*************************************************
-      * 函数
-      * 功能：卡尔曼滤波 Kalman_Filter
-**************************************************/
+////////////////////////kalman/////////////////////////
 float angle, angle_dot;                                //平衡角度值
 void Kalman_Filter(double angle_m, double gyro_m)
 {
   ///陀螺仪积分角度（先验估计）
-  angle += (gyro_m - q_bias) * dt; //偏差e
+  angle += (gyro_m - q_bias) * dt;//带q的是变量的协方差，带m的是测量值
   ///计算角度偏差
-  angle_err = angle_m - angle;
+  angle_err = angle_m - angle;//偏差e
+  ///先验估计误差协方差的微分
   Pdot[0] = Q_angle - P[0][1] - P[1][0];
   Pdot[1] = - P[1][1];
   Pdot[2] = - P[1][1];
@@ -213,9 +210,9 @@ void Kalman_Filter(double angle_m, double gyro_m)
   PCt_0 = C_0 * P[0][0];
   PCt_1 = C_0 * P[1][0];
   E = R_angle + C_0 * PCt_0;
-  ///后验估计误差协方差计算 
   K_0 = PCt_0 / E;
   K_1 = PCt_1 / E;
+  ///后验估计误差协方差计算 
   t_0 = PCt_0;
   t_1 = C_0 * P[0][1];
   P[0][0] -= K_0 * t_0;
@@ -227,66 +224,76 @@ void Kalman_Filter(double angle_m, double gyro_m)
   angle_dot = gyro_m - q_bias; ///更新最优角速度值
 }
 
+
 /* /////////SEND////
 void tcpsend_all(int num,char test[16] , float data1, float data2, float data3,float data4,float data5,float data6)
 {
 
+
  // mySerial.write(str,2);           //向esp8266写数据
+
   dtostrf(angle,3, 2, test);
+
 mySerial.write(35);//ASCLL #井号
   for( i = 0; i < 4; i++)
   {
-  
+
+
     delay(5);
   mySerial.write(test[i]);//ASCLL
   delay(5);
   }
   mySerial.write(35);//ASCLL #井号
-  }*/
 
-/*************************************************
-      * 函数
-      * 功能：格式化发送数据，
-      * 函数名(缓冲区 , 待发数据, 整数部分长度, 小数部分长度, 发送数据长度)
+  }*/
+ /*************************************************
+  * 类型：函数
+  * 功能：单个数据串口发送
+  * void 函数名(缓冲区 , 待发数据, 整数部分长度, 小数部分长度, 传输数据长度（包括空）)
 **************************************************/
 void tcpsend_procceed(char test[16] , float data, int i, int j, int m)
 {
 
-        //i转换后整数部分长度
-        //j转换后小数部分长度
-        //m传入数据长度ascll m<8
+        
        // mySerial.write(str,2);
-
+       /*m传入数据长度ascll m<8*/
+       
+       /*dtostrf将 float/double转换为char
+        * i转换后整数部分长度
+        *j转换后小数部分长度
+        */
+       
         dtostrf(data,i, j, test);//保存到该char数组中。
-        //dtostrf(signalsign,2, 0, test1);//保存到该char数组中。
         
        for( i = 0; i < m; i++)
         {
         mySerial.write(test[i]);//ASCLL 向esp8266写数据
-        //delay(5);
         }
         //mySerial.write(35);//ASCLL #井号,分隔符
         test[16] = {0};//reset char
 }
-//下次测试若无分隔符传输情况
 
+//下次测试若无分隔符传输情况
+ /*************************************************
+  * 建立：2019.4.19；
+  * 修改：2019.7.12 lqh
+  * 类型：函数
+  * 功能：按格式数据包串口发送，数据包类型1
+  * void 函数名(结构体地址)
+  * 效果：控制小车运动
+**************************************************/
 void transmit_1(GESTURE *g)//发送数据
 {
 
    float t_pitch;
   float t_roll;
-
+  
   t_pitch=fabs(g->pitch);
   t_roll=fabs(g->roll);//发送无符号数据
-
-  if(t_pitch>=90)
-  {
-    t_pitch=90.00;
-  }
-  if(t_roll>=90)
-  {
-    t_roll=90.00;
-  }
+  /*限幅*/
+  if(t_pitch>=90) t_pitch=90.00;
+  if(t_roll>=90) t_roll=90.00;
+  
   //transmit
        mySerial.write(36);//ASCLL $号,占位符
        
@@ -305,6 +312,14 @@ void transmit_1(GESTURE *g)//发送数据
        tcpsend_procceed(test , t_roll, 3, 2, 5);//13 14 15 16 17 
        mySerial.write(33);//ASCLL !号，结束符
 }
+ /*************************************************
+  * 建立：2019.；
+  * 修改：？；2019.7.12 lqh； 
+  * 类型：函数
+  * 功能：按格式数据包串口发送，数据包类型2
+  * void 函数名(指令)
+  * 效果：特殊效果
+**************************************************/
 void transmit_2(uint8_t instruction)//发送数据,第二类发送
 {
   /*0：故障
@@ -327,7 +342,14 @@ void transmit_2(uint8_t instruction)//发送数据,第二类发送
 
         Serial.println("调用第二个发送函数");
 }
-
+ /*************************************************
+  * 建立：2019.；
+  * 修改：？；2019.7.12 lqh； 
+  * 类型：函数
+  * 功能：按格式数据包串口发送，数据包类型3
+  * void 函数名()
+  * 效果：机械臂
+**************************************************/
 void transmit_3()//发送数据    
 {
 
@@ -383,10 +405,22 @@ void transmit_3()//发送数据
        mySerial.write(35);//ASCLL #井号*/
        mySerial.write(33);//ASCLL !号，结束符
 }
-
+ /*************************************************
+  * 建立：2019.4；
+  * 修改：？；2019.7.12 lqh； 
+  * 类型：函数
+  * 功能：获取mpu6050数据并存入指定数组位置
+  * void 函数名(位置)
+  * 效果：特殊效果
+**************************************************/
 void getdata(int num)
 {
-  for(count = 0;count <5;count++)
+  float sum_pitch=0.0f;//多次pitch角的和//7.12pm lqh
+  float ave_pitch=0.0f;//picth角的平均值
+  float sum_roll=0.0f;
+  float ave_roll=0.0f;
+  //int count;
+  for(int count = 0;count <5;count++)
     {
       mpu.getMotion6(&ax, &ay ,&az, &gx, &gy, &gz);     //IIC获取MPU6050六轴数据 ax ay az gx gy gz
 
@@ -414,7 +448,7 @@ void getdata(int num)
       device[num].equipment = num;
       sum_pitch=0;//数据归零
       sum_roll=0;
-      count=0;
+      //count=0;
 }
 
 void setup()
@@ -427,8 +461,8 @@ void setup()
 
     pinMode(C1,OUTPUT);
     pinMode(C2,OUTPUT);
-    pinMode(OPEN_GPIO,INPUT);
-    pinMode(OPEN_GPIO_HAND,INPUT);
+   // pinMode(OPEN_GPIO,INPUT);//7.12pm lqh
+    //pinMode(OPEN_GPIO_HAND,INPUT);//7.12pm lqh
 
     pinMode(LED1,OUTPUT);
      pinMode(SW,INPUT);
@@ -454,7 +488,14 @@ void setup()
      Serial.println("mpu6050 master iic fail!");
     }
 }
-
+ /*************************************************
+  * 建立：2019.；
+  * 修改： 
+  * 类型：函数
+  * 功能：初始化设备参数
+  * void 函数名()
+  * 效果：
+**************************************************/
 void init_device()//初始化设备参数
 {
   int temp_a;
@@ -497,7 +538,7 @@ void loop()
               digitalWrite(LED2,LOW);
               digitalWrite(LED3,LOW);
               open_status=1;
-              init_device()
+              init_device();
             }
             if(click1==4)
             {
@@ -506,7 +547,7 @@ void loop()
               digitalWrite(LED2,HIGH);
               digitalWrite(LED3,LOW);
               open_status=2;
-              init_device()
+              init_device();
             }
             if(click1==6)
             {
@@ -515,7 +556,7 @@ void loop()
               digitalWrite(LED2,LOW);
               digitalWrite(LED3,HIGH);
               open_status=3;
-              init_device()
+              init_device();
             }
             if(click1==8)
             {
@@ -524,7 +565,7 @@ void loop()
               digitalWrite(LED2,LOW);
               digitalWrite(LED3,LOW);
               open_status=0;
-              init_device()
+              init_device();
             }
        }
     
@@ -544,9 +585,9 @@ void loop()
        {
          getdata(0);
 
-         axt = float(ax) / 2048 ;
+        /* axt = float(ax) / 2048 ;
          ayt = float(ay) / 2048 ;
-         azt = float(az) / 2048;
+         azt = float(az) / 2048;*/
 
 
         /*Serial.print("ax: ");Serial.print(axt);Serial.print(",");
@@ -556,11 +597,13 @@ void loop()
         Serial.print("roll: ");Serial.print(device[0].roll);Serial.print(",");
         //Serial.print("angle_dot: ");Serial.print(angle_dot);Serial.print(",");
         Serial.print("pitch: ");Serial.println(device[0].pitch);
-         judge_gesture(&real_gesture);//获取姿势参数
+        
+         judge_gesture(&real_gesture, device);//获取手背姿势参数
+         
          real_gesture.equipment = 0;
-         count=0;//进行初始化操作
-         sum_pitch=0;
-         sum_roll=0;
+         //count=0;//进行初始化操作 7.12pm lqh
+         //sum_pitch=0;
+         //sum_roll=0;
          /*Serial.print(real_gesture.up_down);
          Serial.print("\t");
          Serial.print(real_gesture.left_right);
@@ -569,16 +612,15 @@ void loop()
          Serial.print("\n");*/
 
          transmit_1(&real_gesture);//调用发送数据函数
-         //counter++;
        }
     //手指
     else if(choose == 1)
     {
       getdata(1);
 
-      axt = float(ax) / 2048 ;
+      /*axt = float(ax) / 2048 ;
       ayt = float(ay) / 2048 ;
-      azt = float(az) / 2048;
+      azt = float(az) / 2048;*/
 
       /*Serial.print("ax: ");Serial.print(axt);Serial.print(",");
       Serial.print("ay: ");Serial.print(ayt);Serial.print(",");
@@ -600,7 +642,7 @@ void loop()
     }
     if(open_status==3&&choose==1)
     {
-      trasmit_3();//调用机械臂传输函数
+      transmit_3();//调用机械臂传输函数
     }
   //可视化分析
 
@@ -635,18 +677,23 @@ void loop()
   sum_roll+=fNewRoll;
   count++;
 }*/
-
-void judge_gesture(GESTURE *g)//判断姿势，返回值为 1234 ，1：向上，2：向下
+ /*************************************************
+  * 建立：2019.；
+  * 修改： 
+  * 类型：函数
+  * 功能：手背姿态判断
+  * void 函数名()
+  * 效果：
+**************************************************/
+void judge_gesture(GESTURE *g, DEVICE device[])//判断姿势，返回值为 1234 ，1：向上，2：向下
 {
-  //ave_pitch=sum_pitch/count;
-  //ave_roll=sum_roll/count;
-  g->pitch=ave_pitch;//角度值赋值
-  g->roll=ave_roll;//需要发送
-  if(ave_pitch>=LITTLE_UP)//判定角度，如果大于25°,小于45,则向中上，此处可更改
+  g->pitch=device[0].pitch;//角度值赋值
+  g->roll=device[0].roll;//需要发送
+  if(device[0].pitch>=LITTLE_UP)//判定角度，如果大于25°,小于45,则向中上，此处可更改
   {
     g->up_down=UP;
   }
-  else if(ave_pitch<=LITTLE_DOWN)
+  else if(device[0].pitch<=LITTLE_DOWN)
   {
     g->up_down=DOWN;
   }
@@ -654,11 +701,11 @@ void judge_gesture(GESTURE *g)//判断姿势，返回值为 1234 ，1：向上�
   {
     g->up_down=0;
   }
-  if(ave_roll>=LITTLE_RIGHT)//判定角度，如果x向右大于25°,小于45,则向中右，此处可更改
+  if(device[0].roll>=LITTLE_RIGHT)//判定角度，如果x向右大于25°,小于45,则向中右，此处可更改
   {
     g->left_right=RIGHT;
   }
-  else if(ave_roll<=LITTLE_LEFT)
+  else if(device[0].roll<=LITTLE_LEFT)
   {
     g->left_right=LEFT;
   }
@@ -667,6 +714,14 @@ void judge_gesture(GESTURE *g)//判断姿势，返回值为 1234 ，1：向上�
     g->left_right=0;
   }
 }
+ /*************************************************
+  * 建立：2019.；
+  * 修改： 
+  * 类型：函数
+  * 功能：
+  * void 函数名()
+  * 效果：
+**************************************************/
 void have_twogesture(int backhand,int dev,TWOGESTURE *tg)
 {
   float D_value_pitch=0.0;//定义pitch角的差值
