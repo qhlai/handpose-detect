@@ -129,10 +129,9 @@ float Mx,My,Mz;//以特斯拉为单位的转换后的磁场强度
 /////////////////////////////////////////////////////////
 
 
-float pre_arr[3][11]={0};
-
+float pre_arr[3][11]={0};//翻手
 int counter=0;//定义翻手计数器
-
+//opisthenar 手背
 typedef struct gesture
 {
   float up_down;//上下参数
@@ -141,6 +140,7 @@ typedef struct gesture
   float roll;//翻滚角
   int equipment;//设备号
 }GESTURE;
+GESTURE real_gesture;
 typedef struct twogesture
 {
   //******以下均为1真0假*******//
@@ -151,7 +151,7 @@ typedef struct twogesture
   int thumb;//灯光(大拇指)
   float finalnum;//要发送的最终参数，由上到下分别为0，1，2，3，4。
 }TWOGESTURE;
-    GESTURE real_gesture;
+    
     TWOGESTURE two_gesture;
 //****************MPU6050数据结构体************************//
 typedef struct device1
@@ -223,7 +223,110 @@ void Kalman_Filter(double angle_m, double gyro_m)
   q_bias += K_1 * angle_err;///更新最优估计值的偏差
   angle_dot = gyro_m - q_bias; ///更新最优角速度值
 }
+void Get_QMC5883_mpu6050()
+{
+   writeByte(0x68, 0x6B, 0x0);//enable mpu6050 from sleep
 
+   writeByte(0x68, 0x6A, 0x20);//enable i2c master mode
+   writeByte(0x68, 0x24, 0x0D); //只设置速率 400khz
+   writeByte(0x68, 0x25, 0x0D);//写(read:8d,write:0d)
+   writeByte(0x68, 0x26, 0x09);//qmcmodreg
+   writeByte(0x68, 0x63, 0x1D);//mode config
+   writeByte(0x68, 0x27, 0x01);//will write
+   delay(1);
+   writeByte(0x68, 0x27, 0x81);//enable write 1 reg
+
+   writeByte(0x68, 0x27, 0x01);//disable write
+   writeByte(0x68, 0x25, 0x8D);//read mode
+   writeByte(0x68, 0x26, 0x00);//slave reg begin
+   writeByte(0x68, 0x27, 0x06);//will read 6 registers
+   writeByte(0x68, 0x27, 0x86);//read 6 regs
+   delay(1);
+   writeByte(0x68, 0x27, 0x06);//disable read 6 registers
+   
+  Wire.beginTransmission(0x68);//读写开始
+  Wire.write(0x49); //选择X,Y，Z所在数据储存寄存器
+  Wire.endTransmission();
+
+  Wire.requestFrom(0x68, 6);
+   if(6<=Wire.available())//注意：国产QMC5883L顺序为xyz，进口顺序为xzy
+   {
+     G_x = Wire.read()<<8; //X msb
+     G_x |= Wire.read(); //X lsb
+     G_y = Wire.read()<<8; //Z msb
+     G_y |= Wire.read(); //Z lsb
+     G_z = Wire.read()<<8; //Y msb
+     G_z |= Wire.read(); //Y lsb
+   }
+   Mx=(float)G_x;
+   My=(float)G_y;
+   Mz=(float)G_z;
+ //打印坐标到串口
+  Mx/=10000;
+  My/=10000;
+  Mz/=10000;//转换为特斯拉
+  /*Serial.print("x: ");
+   Serial.print(Mx);
+   Serial.print("  y: ");
+   Serial.print(My);
+   Serial.print("  z: ");
+   Serial.println(Mz); */
+}
+void writeByte(uint8_t address, uint8_t subAddress, uint8_t data)
+{
+  Wire.beginTransmission(address);  // Initialize the Tx buffer
+  Wire.write(subAddress);           // Put slave register address in Tx buffer
+  Wire.write(data);                 // Put data in Tx buffer
+  Wire.endTransmission();           // Send the Tx buffer
+}
+ uint8_t readByte(uint8_t address, uint8_t subAddress)
+{
+  uint8_t data; // `data` will store the register data   
+  Wire.beginTransmission(address);         // Initialize the Tx buffer
+  Wire.write(subAddress);                  // Put slave register address in Tx buffer
+  Wire.endTransmission(false);             // Send the Tx buffer, but send a restart to keep connection alive
+  Wire.requestFrom(address, (uint8_t) 1);  // Read one byte from slave register address 
+  data = Wire.read();                      // Fill Rx buffer with result
+  return data;                             // Return data read from slave register
+}
+
+void readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_t * dest)
+{  //readBytes(MPU6050_ADDRESS, XA_OFFSET_H, 2, &data[0]);
+  Wire.beginTransmission(address);   // Initialize the Tx buffer
+  Wire.write(subAddress);            // Put slave register address in Tx buffer
+  Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
+  uint8_t i = 0;
+        Wire.requestFrom(address, count);  // Read bytes from slave register address 
+  while (Wire.available()) {
+        dest[i++] = Wire.read(); }         // Put read results in the Rx buffer
+}
+
+uint8_t getAddress(uint8_t addr) 
+{
+   //if (num > 3) return 0;
+    I2Cdev::readByte(0x68, addr, temphex);
+    return temphex[0];
+}
+void Get_i2cdump(uint8_t num)//display all register data,(usedfor debug)
+{
+  
+    for(int8_t count = 0; count < num; count++){
+        
+       Serial.print("<");
+       Serial.print("0x");
+       Serial.print(count,HEX);
+       Serial.print("> ");
+       Serial.print("0x");
+         Serial.print(getAddress(count), HEX);
+       //Serial.print(bump[count],HEX);
+       Serial.print(" ");
+       Serial.print(" ");
+       if(count%8 == 0){
+       Serial.println();
+
+   }
+  }
+}
 
 /* /////////SEND////
 void tcpsend_all(int num,char test[16] , float data1, float data2, float data3,float data4,float data5,float data6)
@@ -762,6 +865,14 @@ void have_twogesture(int backhand,int dev,TWOGESTURE *tg)
     }
   }
 }
+ /*************************************************
+  * 建立：2019.；
+  * 修改： 
+  * 类型：函数
+  * 功能：初始化双传感器判断手势数据
+  * void 函数名()
+  * 效果：
+**************************************************/
 void initgesture(TWOGESTURE *tg)
 {
   tg->none=1;
@@ -792,7 +903,7 @@ int judge_move()
     }
     for(it1=0;it1<10;it1++)
     {
-      if(D_arr[it1]>=8&&D_arr[it1]<=40)
+      if(D_arr[it1]>=8 && D_arr[it1]<=40)
       {
         tnum++;
       }
