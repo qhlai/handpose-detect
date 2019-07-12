@@ -76,7 +76,17 @@ while True:
                 ser.write(b"+")
                 ser.write(atwo_movement)
                 ser.write(b"}")
-
+        elif data[0:1:1]=="%":
+            servo_roll=data[1:4]
+            servo_pitch=data[8:11]
+            servo_minus=data[15:18]
+            aservo_roll=(int)(servo_roll.encode('utf-8'))
+            aservo_pitch=(int)(servo_pitch.encode('utf-8'))
+            aservo_minus=(int)(servo_minus.encode('utf-8'))
+            bus.write_byte(address,2)
+            bus.write_byte(address,aservo_roll)
+            bus.write_byte(address,aservo_pitch)
+            bus.write_byte(address,aservo_minus)
         #send
 
         #tctimeClient.send(('[%s] %s' % (ctime(),data)).encode())
