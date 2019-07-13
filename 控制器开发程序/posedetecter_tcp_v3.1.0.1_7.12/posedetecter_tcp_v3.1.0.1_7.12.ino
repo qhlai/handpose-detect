@@ -414,6 +414,7 @@ void transmit_1(GESTURE *g)//发送数据
        mySerial.write(35);//ASCLL #井号*/
        tcpsend_procceed(test , t_roll, 3, 2, 5);//13 14 15 16 17 
        mySerial.write(33);//ASCLL !号，结束符
+       //Serial.println("调用第一个发送函数");
 }
  /*************************************************
   * 建立：2019.；
@@ -443,7 +444,7 @@ void transmit_2(uint8_t instruction)//发送数据,第二类发送
        tcpsend_procceed(test , instruction, 1, 0, 1);//发送指令
        mySerial.write(33);//ASCLL !号，结束符
 
-        Serial.println("调用第二个发送函数");
+        //Serial.println("调用第二个发送函数");
 }
  /*************************************************
   * 建立：2019.；
@@ -507,6 +508,7 @@ void transmit_3()//发送数据
        /*tcpsend_procceed(test , velocity, 2, 0, 2);
        mySerial.write(35);//ASCLL #井号*/
        mySerial.write(33);//ASCLL !号，结束符
+       //Serial.println("调用第三个发送函数");
 }
  /*************************************************
   * 建立：2019.4；
@@ -564,11 +566,9 @@ void setup()
 
     pinMode(C1,OUTPUT);
     pinMode(C2,OUTPUT);
-   // pinMode(OPEN_GPIO,INPUT);//7.12pm lqh
-    //pinMode(OPEN_GPIO_HAND,INPUT);//7.12pm lqh
 
     pinMode(LED1,OUTPUT);
-     pinMode(SW,INPUT);
+     pinMode(SW,INPUT_PULLUP);
     pinMode(LED2,OUTPUT);
     pinMode(LED3,OUTPUT);
 
@@ -611,6 +611,8 @@ void init_device()//初始化设备参数
 
 void loop()
 {
+  int old_open_status;
+  old_open_status=open_status;//记录状态
            //recive
        while(mySerial.available())           //从esp8266读数据
       {
@@ -641,7 +643,10 @@ void loop()
               digitalWrite(LED2,LOW);
               digitalWrite(LED3,LOW);
               open_status=1;
-              init_device();
+              if(open_status!=old_open_status)//第一次变化才清零所有数据
+              {
+                init_device();
+              }
             }
             if(click1==4)
             {
@@ -650,7 +655,10 @@ void loop()
               digitalWrite(LED2,HIGH);
               digitalWrite(LED3,LOW);
               open_status=2;
-              init_device();
+              if(open_status!=old_open_status)//第一次变化才清零所有数据
+              {
+                init_device();
+              }
             }
             if(click1==6)
             {
@@ -659,7 +667,10 @@ void loop()
               digitalWrite(LED2,LOW);
               digitalWrite(LED3,HIGH);
               open_status=3;
-              init_device();
+              if(open_status!=old_open_status)//第一次变化才清零所有数据
+              {
+                init_device();
+              }
             }
             if(click1==8)
             {
@@ -668,9 +679,13 @@ void loop()
               digitalWrite(LED2,LOW);
               digitalWrite(LED3,LOW);
               open_status=0;
-              init_device();
+              if(open_status!=old_open_status)//第一次变化才清零所有数据
+              {
+                init_device();
+              }
             }
        }
+       //Serial.print("开关状态：");Serial.println(open_status);
     
     /*#ifdef DEBUG//测试状态开关必为闭合，以便测试
     open_status=OPEN;
@@ -713,8 +728,10 @@ void loop()
          Serial.print("\t");
          Serial.print(real_gesture.pitch);
          Serial.print("\n");*/
-
+        if(open_status==1)
+        {
          transmit_1(&real_gesture);//调用发送数据函数
+        }
        }
     //手指
     else if(choose == 1)
@@ -734,17 +751,19 @@ void loop()
       Serial.print("pitch: ");Serial.println(device[1].pitch);
       //counter++;
     }
-    if(open_status==2&&choose==1)//此处定义开关，OPEN为1，即手势状态，UNOPEN为0，即手背控制；第二个条件：进行一轮循环读取之后计算
+    if(open_status==2&&choose==1)//第二个条件：进行一轮循环读取之后计算
     {
         counter++;//进行一次循环读取，计数器+1
          have_twogesture(0,1,&two_gesture);//入口参数为两台设备号,规定第一个为手背
          //**********调用发送姿势函数************//
+         //Serial.println("特殊手势");
          transmit_2(two_gesture.finalnum);
          //empty(&towreal_gesture);//清零姿势库
          Serial.print("twogesture:");Serial.println(two_gesture.finalnum);
     }
     if(open_status==3&&choose==1)
     {
+      //Serial.println("机械臂");
       transmit_3();//调用机械臂传输函数
     }
   //可视化分析
@@ -764,11 +783,12 @@ void loop()
   }
   if(open_status==1)
   {
+    //Serial.println("手背");
     choose=0;//如果为手背状态，则不读取其他MPU6050
   }
   
   //counter++;//进行一次循环读取，计数器+1
-  Serial.println(choose);
+  Serial.print("choose");Serial.println(choose);
   delay(50);
   }
 }

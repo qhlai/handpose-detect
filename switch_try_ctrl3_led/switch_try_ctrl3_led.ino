@@ -8,8 +8,9 @@ int click1 = 0;//开关信号的改变次数，初始化为0
 
 void setup() 
 {
+  Serial.begin(9600);
   pinMode(LED1,OUTPUT);
-  pinMode(SW,INPUT);
+  pinMode(SW,INPUT_PULLUP);
   pinMode(LED2,OUTPUT);
   pinMode(LED3,OUTPUT);
 
@@ -34,6 +35,7 @@ void loop()
       click1++;//次数累计
       }
     }
+    //Serial.println(click1);
   if(click1 % 2==0&&click1<=8)//如果开关状态改变2次
   {
         //click1 = 0;//归零
