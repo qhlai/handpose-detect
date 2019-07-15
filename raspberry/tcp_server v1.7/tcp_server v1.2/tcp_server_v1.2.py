@@ -108,6 +108,11 @@ while True:
                 ser.write(b"+")
                 ser.write(atwo_movement)
                 ser.write(b"}")
+                if two_movement=="1":
+                    bus.write_byte(address,1)
+                    bus.write_byte(address,90)
+                    bus.write_byte(address,90)
+                    bus.write_byte(address,50)
         elif data[0:1:1]=="%":
             servo_roll=data[1:4]
             servo_pitch=data[8:11]
@@ -175,4 +180,3 @@ def DisplayAllDistance(num):
 def Avoid_Obstacle():
     if(diatance[0] < 20):
         
-
