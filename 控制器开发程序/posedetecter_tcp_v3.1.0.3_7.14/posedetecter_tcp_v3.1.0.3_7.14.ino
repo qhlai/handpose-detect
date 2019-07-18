@@ -631,6 +631,7 @@ void setup()
 
     pinMode(C1,OUTPUT);
     pinMode(C2,OUTPUT);
+    pinMode(C3,OUTPUT);
 
     pinMode(LED1,OUTPUT);
      pinMode(SW,INPUT_PULLUP);
@@ -677,6 +678,11 @@ void init_device()//初始化设备参数
 
 void loop()
 { 
+for(int tes = 0;tes<3;tes++)
+{
+  Serial.print(device[tes].roll);
+   Serial.print(device[tes].pitch);
+}
   while(mySerial.available())           //从esp8266读数据
       {
         Serial.write(mySerial.read());//回发
