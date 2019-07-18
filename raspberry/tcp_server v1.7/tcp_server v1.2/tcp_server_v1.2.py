@@ -81,7 +81,7 @@ while True:
             small_digit_p = data[13:15]
             ten_digit_r = data[16:18]
             small_digit_r = data[19:21]
-            if movement1 in listdata and movement2 in listdata:
+            if movement1 in listdata and movement2 in listdata and Avoid_Obstacle()==0:
                 amovement1=movement1.encode('utf-8')
                 amovement2=movement2.encode('utf-8')
                 aten_digit_p=ten_digit_p.encode('utf-8')
@@ -98,6 +98,19 @@ while True:
                 ser.write(asmall_digit_p)
                 ser.write(aten_digit_r)
                 ser.write(asmall_digit_r)
+                ser.write(b"}")
+            elif Avoid_Obstacle()==1:
+                ser.write(b"{")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
+                ser.write(b"0")
                 ser.write(b"}")
         elif data[0:1:1] == "?":
             two_movement=data[5:6]
@@ -178,5 +191,8 @@ def DisplayAllDistance(num):
         GetDistance(i);
         print("distance["+i+"] = "+distance[i]+"cm ");
 def Avoid_Obstacle():
-    if(diatance[0] < 20):
+    if diatance[0] < 20:
+        return 1
+    else  :
+        return 0
         
