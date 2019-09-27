@@ -79,3 +79,4 @@
 [2019-07-07 15:21:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
 [2019-07-07 15:23:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
 [2019-07-07 15:49:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\code of car\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex
+[2019-07-18 18:16:Program Success:34FF6D064D55383719411543 E:\立项\handpose-detect\完整版\7-17 advance - 终极测试\1.舵机转向小车源码V2 - 1.3.1(1)\1.舵机转向小车源码V2 - 1.3.1\OBJ\Minibalance.hex

@@ -4,7 +4,7 @@ const char *ssid = "LAPTOP";
 const char *password = "299792458";
 
  
-const char *host = "192.168.137.221";
+const char *host = "192.168.137.114";
 const int port = 4302;
 
 WiFiClient client;

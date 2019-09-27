@@ -52,6 +52,12 @@ title('数据');
 legend('原始数据','滤波之后数据');
 grid on;
 
+ figure(2)
+ plot(t1,delt,t1,u);
+ title('方差');
+ legend('delt','U');
+ grid on;
+
 % figure(2)
 % plot(t1,P_now);
 % title('方差');

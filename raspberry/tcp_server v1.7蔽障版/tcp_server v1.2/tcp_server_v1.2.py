@@ -29,8 +29,8 @@ GPIO.setmode(GPIO.BCM)
 #定义 GPIO 引脚 https://blog.csdn.net/oalevel/article/details/79211215
 GPIO_TRIGGER[0] = 17
 GPIO_ECHO[0] = 18
-GPIO_TRIGGER[1] = 27
-GPIO_ECHO[1] = 22
+#GPIO_TRIGGER[1] = 27
+#GPIO_ECHO[1] = 22
 
 #设置 GPIO 的工作方式 (IN / OUT)
 GPIO.setup(GPIO_TRIGGER[0], GPIO.OUT)
@@ -147,9 +147,9 @@ ser.close()
 
 def GetDistance(i):
     tempdistance = []
-    for i in range(8):
+    for m in range(8):
         distance.append([])
-    for i in range(8):
+    for m in range(8):
         # 发送高电平信号到 Trig 引脚
         GPIO.output(GPIO_TRIGGER[i], True)
  
@@ -177,7 +177,7 @@ def GetDistance(i):
         if distance<4:
             distance = 4
         tempdistance[i] =distance
-    for i in range(8):
+    for m in range(8):
         sum = sum+tempdistance
 
     distance[i] = sum/8
