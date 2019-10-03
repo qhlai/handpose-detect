@@ -1,7 +1,7 @@
 ﻿# handpose-detect-arduino-mpu6050-qmc5883
 
 哈尔滨工业大学（深圳）
-大一立项
+立项
 
 2019/3/30晚上 Gzh修改内容：
 control.c文件第227行，更改了判断方式。
