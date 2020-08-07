@@ -1,5 +1,5 @@
 ﻿# handpose-detect-arduino-mpu6050-qmc5883
-# 于mpu6050的手势识别机械臂小车
+# 基于mpu6050的手势识别机械臂小车
 ## 元件
 esp8266 nodemcu
 stm32
